@@ -4,27 +4,18 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 class Project
 {
 public:
-	enum projectStatus { UNRELEASED, NOWPLAYING, RELEASED };
+	//enum projectStatus { UNRELEASED, NOWPLAYING, RELEASED };
 	Project();
-	//Project();
-	//Project(projectStatus);  
-	//void showMenu();
-	//void loadProject();	//on cold start, load project details from file
-	//void addProject();	//3 conditions, check doc for details
-	//void updateProject();
-	//void deleteProject();
-	//void displayProject();
-	//void maintenanceMode();
-	//void addMaterial();
-
 
 	//Material *material;
-	projectStatus status;
+	//vector<Material> material;
+	int status;
 	string title;
 	string summary;
 	vector<string> genre;

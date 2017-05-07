@@ -16,25 +16,38 @@ void ProjectManager::showMenu()
 	cout << " +-------------------------------------------------+" << endl;
 	cout << " |             1. View Projects                    |" << endl;
 	cout << " |             2. Add Project                      |" << endl;
-	cout << " |             3. Exit                             |" << endl;
+	cout << " |             3. Update Project                   |" << endl;
+	cout << " |             4. Delete Project                   |" << endl;
+	cout << " |             9. Exit                             |" << endl;
 	cout << " +-------------------------------------------------+" << endl;
-	cout << " Enter option (1, 2, 3): ";
+	cout << " Enter option (1, 2, 3, ...): ";
 	cin >> user;
 	cin.ignore();
-	if (user == 1)
+
+	switch (user)
+	{
+	case 1:
 		displayProject();
-	else if (user == 2)
+		break;
+	case 2:
 		addProject();
-	else
+		break;
+	case 3:
+		updateProject();
+		break;
+	case 4:
+		deleteProject();
+		break;
+	default:
+		postProject();
 		exit(0);
+	}
 }
 
 void ProjectManager::addProject()
 {
 	try
 	{
-		file.open("test.txt", ios::app);
-
 		Project project;
 
 		// ASK MOVIE STATUS
@@ -42,28 +55,19 @@ void ProjectManager::addProject()
 		cout << " 0 - UNRELEASED" << endl;
 		cout << " 1 - NOW PLAYING" << endl;
 		cout << " 2 - RELEASED" << endl;
-		int ms;
-		cin >> ms;
+		cin >> project.status;
 		cin.ignore();
-		if (ms == 0)
-			project.status = project.UNRELEASED;
-		else if (ms == 1)
-			project.status = project.NOWPLAYING;
-		else if (ms == 2)
-			project.status = project.RELEASED;
-		else
-			project.status = project.UNRELEASED;
-		file << to_string(ms) << endl;
+		//file << to_string(project.status) << endl;
 
 		// ASK TITLE
 		cout << "Enter movie title" << endl;
 		getline(cin, project.title);
-		file << project.title << endl;
+		//file << project.title << endl;
 
 		// ASK SUMMARY
 		cout << "Enter movie summary" << endl;
 		getline(cin, project.summary);
-		file << project.summary << endl;
+		//file << project.summary << endl;
 
 		// ASK GENRE
 		cout << "How many genres are there in this movie?" << endl;
@@ -77,45 +81,40 @@ void ProjectManager::addProject()
 			getline(cin, g);
 			project.genre.push_back(g);
 		}
-		file << to_string(num) << endl;
-		for (int i = 0; i < num; i++)
-		{
-			file << project.genre.at(i) << endl;
-		}
 
 		// ASK RELEASE DATE
 		cout << "Enter release date (DD-MM-YYYY)" << endl;
 		getline(cin, project.releaseDate);
-		file << project.releaseDate << endl;
+		//file << project.releaseDate << endl;
 
 		// ASK LOCATIONS
 		cout << "How many locations was this movie filmed at?" << endl;
 		cin >> num;
 		cin.ignore();
-		file << to_string(num) << endl;
+		//file << to_string(num) << endl;
 		for (int i = 0; i < num; i++)
 		{
 			cout << "Enter movie filming location " + to_string(i + 1) << endl;
 			getline(cin, g);
 			project.locations.push_back(g);
-			file << g << endl;
+			//file << g << endl;
 		}
 
 		// ASK LANGUAGE
 		cout << "Enter the language of the movie" << endl;
 		getline(cin, project.language);
-		file << project.language << endl;
+		//file << project.language << endl;
 
 		// ASK RUNTIME
 		cout << "Enter movie runtime (mins)" << endl;
 		cin >> project.runtime;
 		cin.ignore();
-		file << to_string(project.runtime) << endl;
+		//file << to_string(project.runtime) << endl;
 
 		// ASK KEYWORD
 		cout << "Enter a keyword for the movie" << endl;
 		getline(cin, project.keyword);
-		file << project.keyword << endl;
+		//file << project.keyword << endl;
 
 		// ASK BOX OFFICE (NOWPLAYING OR RELEASED ONLY)
 		if (project.status == 1 || project.status == 2)
@@ -128,11 +127,10 @@ void ProjectManager::addProject()
 		{
 			project.boxOffice = 0;
 		}
-		file << to_string(project.boxOffice) << endl;
+		//file << to_string(project.boxOffice) << endl;
 
 		movies.push_back(project);
-		cout << "file closing" << endl;
-		file.close();
+		
 		showMenu();
 	}
 	catch (exception ex)
@@ -144,12 +142,14 @@ void ProjectManager::addProject()
 }
 
 void ProjectManager::displayProject()
-{
+{	
+	system("cls");
 	cout << movies.size() << endl;
-	for (size_t i = 0; i < movies.size(); i++)
+	for (unsigned i = 0; i < movies.size(); i++)
 	{
 		string tempStatus;
-		if (movies.at(i).status == 1)
+		//cout << to_string(movies.at(i).size()) << endl;
+		if (movies.at(i).status == 1) 
 			tempStatus = "NOW PLAYING";
 		else if (movies.at(i).status == 2)
 			tempStatus = "RELEASED";
@@ -159,7 +159,7 @@ void ProjectManager::displayProject()
 		cout << "Title             : " << movies.at(i).title << endl;
 		cout << "Summary           : " << movies.at(i).summary << endl;
 		cout << "Genre             : ";
-		for (size_t j = 0; j < movies.at(i).genre.size(); j++)
+		for (unsigned j = 0; j < movies.at(i).genre.size(); j++)
 		{
 			cout << movies.at(i).genre.at(j);
 			if (j < movies.at(i).genre.size() - 1) cout << ", ";
@@ -167,7 +167,7 @@ void ProjectManager::displayProject()
 		cout << endl;
 		cout << "Release Date      : " << movies.at(i).releaseDate << endl;
 		cout << "Filming locations : ";
-		for (size_t k = 0; k < movies.at(i).locations.size(); k++)
+		for (unsigned k = 0; k < movies.at(i).locations.size(); k++)
 		{
 			cout << movies.at(i).locations.at(k);
 			if (k < movies.at(i).locations.size() - 1) cout << ", ";
@@ -187,35 +187,35 @@ void ProjectManager::loadProject()
 	cout << "Loading file..." << endl;
 	try
 	{
-		file.open("test.txt", ios::app);
-		file.close();
+		//file.open("test.txt", ios::app);
 		infile.open("test.txt");
 		
-		Project p;
+		//Project p;
 		string g;
-		int num;
+		//string temp;
+		//int test = 1;
 		while (!infile.eof())
 		{	
-			cout << "AYY LETS GO" << endl;
+			Project p;
+			//cout << test << endl;
+			//test++;
+
+			int num;
 
 			// READ STATUS
-			int ms;
 			getline(infile, g);
-			ms = stoi(g);
-			if (ms == 1)
-				p.status = p.NOWPLAYING;
-			else if (ms == 2)
-				p.status = p.RELEASED;
-			else
-				p.status = p.UNRELEASED;
-			
+			//if (g == "0" || g == "1" || g == "2")
+			p.status = stoi(g);
+			//else
+				//break;
+
 			// READ TITLE
 			getline(infile, p.title);
 			
 			// READ SUMMARY
 			getline(infile, p.summary);
 
-			
+			// READ GENRE
 			getline(infile, g);
 			//cout << typeid(g).name() << g << endl;
 			num = stoi(g);
@@ -255,4 +255,165 @@ void ProjectManager::loadProject()
 		cerr << ex.what() << endl;
 	}
 	infile.close();
+}
+
+void ProjectManager::postProject()
+{
+	try
+	{
+		file.open("test.txt");
+
+		for (unsigned i = 0; i < movies.size(); i++)
+		{
+			// POST STATUS
+			file << to_string(movies.at(i).status) << endl;
+			// POST TITLE
+			file << movies.at(i).title << endl;
+			// POST SUMMARY
+			file << movies.at(i).summary << endl;
+			// POST GENRE SIZE
+			file << to_string(movies.at(i).genre.size()) << endl;
+			// POST GENRES
+			for (unsigned j = 0; j < movies.at(i).genre.size(); j++)
+			{
+				file << movies.at(i).genre.at(j) << endl;
+			}
+			file << movies.at(i).releaseDate << endl;
+			file << to_string(movies.at(i).locations.size()) << endl;
+			for (unsigned k = 0; k < movies.at(i).locations.size(); k++)
+			{
+				file << movies.at(i).locations.at(k) << endl;
+			}
+			file << movies.at(i).language << endl;
+			file << to_string(movies.at(i).runtime) << endl;
+			file << movies.at(i).keyword << endl;
+			file << to_string(movies.at(i).boxOffice) << endl;
+		}
+
+		file.close();
+	}
+	catch (exception ex)
+	{
+
+	}
+}
+
+void ProjectManager::updateProject()
+{
+	cout << "Enter the movie title to update" << endl;
+	string tempUpdate;
+	getline(cin, tempUpdate);
+	for (unsigned i = 0; i < movies.size(); i++)
+	{
+		if (tempUpdate == movies.at(i).title)
+		{
+			//cout << "This one workds" << endl;
+			//movies.erase(movies.begin() + i);
+
+			cout << " +-------------------------------------------------+" << endl;
+			cout << " |             1. Status                           |" << endl;
+			cout << " |             2. Title                            |" << endl;
+			cout << " |             3. Summary                          |" << endl;
+			cout << " |             4. Genre                            |" << endl;
+			cout << " |             5. Release Date                     |" << endl;
+			cout << " |             6. Filming Locations                |" << endl;
+			cout << " |             7. Language                         |" << endl;
+			cout << " |             8. Runtime                          |" << endl;
+			cout << " |             9. Keyword                          |" << endl;
+			cout << " |            10. Box Office                       |" << endl;
+			cout << " +-------------------------------------------------+" << endl;
+			cout << "Which field do you want to change? (1, 2, 3, ...)" << endl;
+
+			int user;
+			int num;
+			string g;
+			cin >> user;
+			cin.ignore();
+
+			switch (user)
+			{
+			case 1:
+				cout << "Enter movie status" << endl;
+				cout << " 0 - UNRELEASED" << endl;
+				cout << " 1 - NOW PLAYING" << endl;
+				cout << " 2 - RELEASED" << endl;
+				cin >> movies.at(i).status;
+				cin.ignore();
+				break;
+			case 2:
+				cout << "Enter movie title" << endl;
+				getline(cin, movies.at(i).title);
+				break;
+			case 3:
+				cout << "Enter movie summary" << endl;
+				getline(cin, movies.at(i).summary);
+				break;
+			case 4:
+				cout << "How many genres are there in this movie?" << endl;
+				cin >> num;
+				cin.ignore();
+				for (int i = 0; i < num; i++)
+				{
+					cout << "Enter movie genre number " + to_string(i + 1) << endl;
+					getline(cin, g);
+					movies.at(i).genre.push_back(g);
+				}
+				break;
+			case 5:
+				cout << "Enter release date (DD-MM-YYYY)" << endl;
+				getline(cin, movies.at(i).releaseDate);
+				break;
+			case 6:
+				cout << "How many locations was this movie filmed at?" << endl;
+				cin >> num;
+				cin.ignore();
+				for (int i = 0; i < num; i++)
+				{
+					cout << "Enter movie filming location " + to_string(i + 1) << endl;
+					getline(cin, g);
+					movies.at(i).locations.push_back(g);
+				}
+				break;
+			case 7:
+				cout << "Enter the language of the movie" << endl;
+				getline(cin, movies.at(i).language);
+				break;
+			case 8:
+				cout << "Enter movie runtime (mins)" << endl;
+				cin >> movies.at(i).runtime;
+				cin.ignore();
+				break;
+			case 9:
+				cout << "Enter a keyword for the movie" << endl;
+				getline(cin, movies.at(i).keyword);
+				break;
+			case 10:
+				cout << "Enter the weekly box office for the movie" << endl;
+				cin >> movies.at(i).boxOffice;
+				cin.ignore();
+				break;
+			default:
+				cout << "Invalid input" << endl;
+				break;
+			}
+		}
+	}
+	showMenu();
+}
+
+void ProjectManager::deleteProject()
+{
+	cout << "Enter the movie title to delete" << endl;
+	string tempDelete;
+	getline(cin, tempDelete);
+
+	for (unsigned i = 0; i < movies.size(); i++)
+	{
+		if (tempDelete == movies.at(i).title)
+		{
+			//cout << "This one workds" << endl;
+			movies.erase(movies.begin() + i);
+		}
+	}
+	showMenu();
 }

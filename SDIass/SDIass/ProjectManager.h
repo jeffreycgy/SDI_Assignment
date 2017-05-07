@@ -11,6 +11,9 @@ public:
 	void addProject();
 	void displayProject();
 	void loadProject();
+	void postProject();
+	void updateProject();
+	void deleteProject();
 private:
 	vector<Project> movies;
 	//vector<Project> readMovies;
