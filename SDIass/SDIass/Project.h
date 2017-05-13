@@ -10,11 +10,6 @@ using namespace std;
 class Project
 {
 public:
-	//enum projectStatus { UNRELEASED, NOWPLAYING, RELEASED };
-	Project();
-
-	//Material *material;
-	//vector<Material> material;
 	int status;
 	string title;
 	string summary;

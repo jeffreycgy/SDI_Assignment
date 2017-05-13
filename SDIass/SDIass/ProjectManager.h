@@ -1,5 +1,6 @@
 #pragma once
 #include "Project.h"
+#include "Material.h"
 #include <vector>
 using namespace std;
 
@@ -14,10 +15,16 @@ public:
 	void postProject();
 	void updateProject();
 	void deleteProject();
+	void searchProject();
+	void addMaterial();
+	void loadMaterial();
+	void postMaterial();
+	void displayMaterial();
+	void deleteMaterial();
+	void searchMaterial(string title);
 private:
 	vector<Project> movies;
-	//vector<Project> readMovies;
-	//Project p;
+	vector<Material> materials;
 	ofstream file;
 	ifstream infile;
 };

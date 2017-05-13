@@ -1,5 +1,6 @@
 #include "ProjectManager.h"
 #include "Project.h"
+#include "Material.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -7,6 +8,7 @@ using namespace std;
 ProjectManager::ProjectManager()
 {
 	loadProject();
+	loadMaterial();
 	showMenu();
 }
 
@@ -18,6 +20,10 @@ void ProjectManager::showMenu()
 	cout << " |             2. Add Project                      |" << endl;
 	cout << " |             3. Update Project                   |" << endl;
 	cout << " |             4. Delete Project                   |" << endl;
+	cout << " |             5. Search Project                   |" << endl;
+	cout << " |             6. View Materials                   |" << endl;
+	cout << " |             7. Add Material                     |" << endl;
+	cout << " |             8. Delete Material                  |" << endl;
 	cout << " |             9. Exit                             |" << endl;
 	cout << " +-------------------------------------------------+" << endl;
 	cout << " Enter option (1, 2, 3, ...): ";
@@ -38,8 +44,21 @@ void ProjectManager::showMenu()
 	case 4:
 		deleteProject();
 		break;
+	case 5:
+		searchProject();
+		break;
+	case 6:
+		displayMaterial();
+		break;
+	case 7:
+		addMaterial();
+		break;
+	case 8:
+		deleteMaterial();
+		break;
 	default:
 		postProject();
+		postMaterial();
 		exit(0);
 	}
 }
@@ -57,18 +76,15 @@ void ProjectManager::addProject()
 		cout << " 2 - RELEASED" << endl;
 		cin >> project.status;
 		cin.ignore();
-		//file << to_string(project.status) << endl;
-
+		
 		// ASK TITLE
 		cout << "Enter movie title" << endl;
 		getline(cin, project.title);
-		//file << project.title << endl;
 
 		// ASK SUMMARY
 		cout << "Enter movie summary" << endl;
 		getline(cin, project.summary);
-		//file << project.summary << endl;
-
+		
 		// ASK GENRE
 		cout << "How many genres are there in this movie?" << endl;
 		int num;
@@ -85,8 +101,7 @@ void ProjectManager::addProject()
 		// ASK RELEASE DATE
 		cout << "Enter release date (DD-MM-YYYY)" << endl;
 		getline(cin, project.releaseDate);
-		//file << project.releaseDate << endl;
-
+		
 		// ASK LOCATIONS
 		cout << "How many locations was this movie filmed at?" << endl;
 		cin >> num;
@@ -103,19 +118,16 @@ void ProjectManager::addProject()
 		// ASK LANGUAGE
 		cout << "Enter the language of the movie" << endl;
 		getline(cin, project.language);
-		//file << project.language << endl;
-
+		
 		// ASK RUNTIME
 		cout << "Enter movie runtime (mins)" << endl;
 		cin >> project.runtime;
 		cin.ignore();
-		//file << to_string(project.runtime) << endl;
-
+		
 		// ASK KEYWORD
 		cout << "Enter a keyword for the movie" << endl;
 		getline(cin, project.keyword);
-		//file << project.keyword << endl;
-
+		
 		// ASK BOX OFFICE (NOWPLAYING OR RELEASED ONLY)
 		if (project.status == 1 || project.status == 2)
 		{
@@ -127,15 +139,13 @@ void ProjectManager::addProject()
 		{
 			project.boxOffice = 0;
 		}
-		//file << to_string(project.boxOffice) << endl;
-
 		movies.push_back(project);
 		
 		showMenu();
 	}
 	catch (exception ex)
 	{
-		cerr << ex.what() << endl;
+		
 	}
 
 	
@@ -144,11 +154,10 @@ void ProjectManager::addProject()
 void ProjectManager::displayProject()
 {	
 	system("cls");
-	cout << movies.size() << endl;
+	cout << "Total movies: " << movies.size() << endl << endl;
 	for (unsigned i = 0; i < movies.size(); i++)
 	{
 		string tempStatus;
-		//cout << to_string(movies.at(i).size()) << endl;
 		if (movies.at(i).status == 1) 
 			tempStatus = "NOW PLAYING";
 		else if (movies.at(i).status == 2)
@@ -178,6 +187,8 @@ void ProjectManager::displayProject()
 		cout << "Keyword           : " << movies.at(i).keyword << endl;
 		cout << "Box Office        : " << movies.at(i).boxOffice << endl;
 		cout << endl;
+		searchMaterial(movies.at(i).title);
+		//cout << endl;
 	}
 	showMenu();
 }
@@ -187,27 +198,18 @@ void ProjectManager::loadProject()
 	cout << "Loading file..." << endl;
 	try
 	{
-		//file.open("test.txt", ios::app);
-		infile.open("test.txt");
+		infile.open("ProjectDatabase.txt");
 		
-		//Project p;
 		string g;
-		//string temp;
-		//int test = 1;
 		while (!infile.eof())
 		{	
 			Project p;
-			//cout << test << endl;
-			//test++;
 
 			int num;
 
 			// READ STATUS
 			getline(infile, g);
-			//if (g == "0" || g == "1" || g == "2")
 			p.status = stoi(g);
-			//else
-				//break;
 
 			// READ TITLE
 			getline(infile, p.title);
@@ -217,7 +219,6 @@ void ProjectManager::loadProject()
 
 			// READ GENRE
 			getline(infile, g);
-			//cout << typeid(g).name() << g << endl;
 			num = stoi(g);
 			for (int i = 0; i < num; i++)
 			{
@@ -227,32 +228,28 @@ void ProjectManager::loadProject()
 			getline(infile, p.releaseDate);
 			
 			getline(infile, g);
-			//cout << typeid(g).name() << g << endl;
 			num = stoi(g);
 			for (int i = 0; i < num; i++)
 			{
 				getline(infile, g);
-				cout << typeid(g).name() << g << endl;
 				p.locations.push_back(g);
 			}
 			getline(infile, p.language);
 
 			getline(infile, g);
-			cout << typeid(g).name() << g  << "runtime" << endl;
 			p.runtime = stoi(g);
 			getline(infile, p.keyword);
 			getline(infile, g);
 			
-			//cout << typeid(num).name() << num << endl;
 			p.boxOffice = stod(g);
 
 			movies.push_back(p);
-			cout << "ADDED" << endl;
+			
 		}
 	}
 	catch(exception ex)
 	{
-		cerr << ex.what() << endl;
+		
 	}
 	infile.close();
 }
@@ -261,7 +258,7 @@ void ProjectManager::postProject()
 {
 	try
 	{
-		file.open("test.txt");
+		file.open("ProjectDatabase.txt");
 
 		for (unsigned i = 0; i < movies.size(); i++)
 		{
@@ -416,4 +413,297 @@ void ProjectManager::deleteProject()
 		}
 	}
 	showMenu();
+}
+
+void ProjectManager::searchProject()
+{
+	string tempSearch;
+	cout << "Enter the movie title to search" << endl;
+	getline(cin, tempSearch);
+
+	for (unsigned i = 0; i < movies.size(); i++)
+	{
+		if (tempSearch == movies.at(i).title)
+		{
+			string tempStatus;
+			if (movies.at(i).status == 1)
+				tempStatus = "NOW PLAYING";
+			else if (movies.at(i).status == 2)
+				tempStatus = "RELEASED";
+			else
+				tempStatus = "UNRELEASED";
+			cout << "Status            : " << tempStatus << endl;
+			cout << "Title             : " << movies.at(i).title << endl;
+			cout << "Summary           : " << movies.at(i).summary << endl;
+			cout << "Genre             : ";
+			for (unsigned j = 0; j < movies.at(i).genre.size(); j++)
+			{
+				cout << movies.at(i).genre.at(j);
+				if (j < movies.at(i).genre.size() - 1) cout << ", ";
+			}
+			cout << endl;
+			cout << "Release Date      : " << movies.at(i).releaseDate << endl;
+			cout << "Filming locations : ";
+			for (unsigned k = 0; k < movies.at(i).locations.size(); k++)
+			{
+				cout << movies.at(i).locations.at(k);
+				if (k < movies.at(i).locations.size() - 1) cout << ", ";
+			}
+			cout << endl;
+			cout << "Language          : " << movies.at(i).language << endl;
+			cout << "Runtime           : " << movies.at(i).runtime << " mins" << endl;
+			cout << "Keyword           : " << movies.at(i).keyword << endl;
+			cout << "Box Office        : " << movies.at(i).boxOffice << endl;
+			cout << endl;
+		}
+	}
+	showMenu();
+}
+
+void ProjectManager::addMaterial()
+{
+	try
+	{
+		string tempSearch;
+		cout << "Enter movie title to add material" << endl;
+		getline(cin, tempSearch);
+
+		for (unsigned i = 0; i < movies.size(); i++)
+		{
+			if (movies.at(i).status != 0)
+			{
+				Material m;
+
+				// ASK MATERIAL TYPE
+				cout << "Enter material type" << endl;
+				cout << " 0 - Single-sided DVD" << endl;
+				cout << " 1 - Double-sided DVD" << endl;
+				cout << " 2 - Combo box set" << endl;
+				cout << " 3 - VHS" << endl;
+				cout << " 4 - Blu-ray" << endl;
+				cin >> m.type;
+				cin.ignore();
+
+				// ASK MATERIAL ID
+				cout << "Enter material ID (DVD XXX)" << endl;
+				getline(cin, m.id);
+
+				// ASK FILM TITLE
+				//cout << "Enter material film title" << endl;
+				//getline(cin, m.filmTitle);
+				m.filmTitle = movies.at(i).title;
+
+				// ASK VIDEO FORMAT
+				cout << "Enter material video format" << endl;
+				getline(cin, m.format);
+
+				// ASK AUDIO FORMAT
+				cout << "Enter material audio format" << endl;
+				getline(cin, m.audioFormat);
+
+				// ASK RUNTIME
+				//cout << "Enter material film runtime" << endl;
+				//cin >> m.runtime;
+				//cin.ignore();
+				m.runtime = movies.at(i).runtime;
+
+				// ASK LANGUAGE
+				//cout << "Enter material film language" << endl;
+				//getline(cin, m.language);
+				m.language = movies.at(i).language;
+
+				// ASK RETAIL PRICE
+				cout << "Enter material retail price" << endl;
+				cin >> m.retailPrice;
+				cin.ignore();
+
+				materials.push_back(m);
+				showMenu();
+			}
+			else
+			{
+				cout << "Movie status is UNRELEASED. Unable to add material..." << endl;
+			}
+		}
+	}
+	catch (exception ex)
+	{
+
+	}
+}
+
+void ProjectManager::loadMaterial()
+{
+	cout << "Loading Material file..." << endl;
+	try
+	{
+		infile.open("MaterialDatabase.txt");
+
+		string g;
+		while (!infile.eof())
+		{
+			Material m;
+			int num;
+
+			// READ TYPE
+			getline(infile, g);
+			m.type = stoi(g);
+
+			// READ MATERIAL ID
+			getline(infile, g);
+			m.id = g;
+
+			// READ FILM TITLE;
+			getline(infile, g);
+			m.filmTitle = g;
+
+			// READ VIDEO FORMAT
+			getline(infile, g);
+			m.format = g;
+
+			// READ AUDIO FORMAT
+			getline(infile, g);
+			m.audioFormat = g;
+
+			// READ RUNTIME
+			getline(infile, g);
+			m.runtime = stoi(g);
+
+			// READ LANGUAGE
+			getline(infile, g);
+			m.language = g;
+
+			// READ RETAIL PRICE
+			getline(infile, g);
+			m.retailPrice = stod(g);
+
+			materials.push_back(m);
+		}
+	}
+	catch (exception ex)
+	{
+
+	}
+	infile.close();
+}
+
+void ProjectManager::postMaterial()
+{
+	try
+	{
+		file.open("MaterialDatabase.txt");
+
+		for (unsigned i = 0; i < materials.size(); i++)
+		{
+			// POST TYPE
+			file << to_string(materials.at(i).type) << endl;
+
+			// POST MATERIAL ID
+			file << materials.at(i).id << endl;
+
+			// POST FILM TITLE
+			file << materials.at(i).filmTitle << endl;
+
+			// POST VIDEO FORMAT
+			file << materials.at(i).format << endl;
+
+			// POST AUDIO FORMAT
+			file << materials.at(i).audioFormat << endl;
+
+			// POST RUNTIME
+			file << to_string(materials.at(i).runtime) << endl;
+
+			// POST LANGUAGE
+			file << materials.at(i).language << endl;
+
+			// POST RETAIL PRICE
+			file << to_string(materials.at(i).retailPrice) << endl;
+		}
+		file.close();
+	}
+	catch (exception ex)
+	{
+
+	}
+}
+
+void ProjectManager::displayMaterial()
+{
+	system("cls");
+	cout << "Total materials: " << materials.size() << endl << endl;
+	for (unsigned i = 0; i < materials.size(); i++)
+	{
+		string tempType;
+		if (materials.at(i).type == 0)
+			tempType = "Single-sided DVD";
+		else if (materials.at(i).type == 1)
+			tempType = "Double-sided DVD";
+		else if (materials.at(i).type == 2)
+			tempType = "Combo box set";
+		else if (materials.at(i).type == 3)
+			tempType = "VHS";
+		else if (materials.at(i).type == 4)
+			tempType = "Bly-ray";
+		else
+			tempType = "Single-sided DVD";
+		cout << "Type              : " << tempType << endl;
+		cout << "ID                : " << materials.at(i).id << endl;
+		cout << "Movie title       : " << materials.at(i).filmTitle << endl;
+		cout << "Video format      : " << materials.at(i).format << endl;
+		cout << "Audio format      : " << materials.at(i).audioFormat << endl;
+		cout << "Runtime           : " << materials.at(i).runtime << endl;
+		cout << "Language          : " << materials.at(i).language << endl;
+		cout << "Retail price      : " << materials.at(i).retailPrice << endl;
+		cout << endl;
+	}
+	showMenu();
+}
+
+void ProjectManager::deleteMaterial()
+{
+	cout << "Enter the material ID to delete" << endl;
+	string tempDelete;
+	getline(cin, tempDelete);
+
+	for (unsigned i = 0; i < materials.size(); i++)
+	{
+		if (tempDelete == materials.at(i).id)
+		{
+			materials.erase(materials.begin() + i);
+			cout << "Material deleted successfully" << endl << endl;
+		}
+	}
+	showMenu();
+}
+
+void ProjectManager::searchMaterial(string title)
+{
+	for (unsigned i = 0; i < materials.size(); i++)
+	{
+		if (title == materials.at(i).filmTitle)
+		{
+			string tempType;
+			if (materials.at(i).type == 0)
+				tempType = "Single-sided DVD";
+			else if (materials.at(i).type == 1)
+				tempType = "Double-sided DVD";
+			else if (materials.at(i).type == 2)
+				tempType = "Combo box set";
+			else if (materials.at(i).type == 3)
+				tempType = "VHS";
+			else if (materials.at(i).type == 4)
+				tempType = "Bly-ray";
+			else
+				tempType = "Single-sided DVD";
+			cout << "Type              : " << tempType << endl;
+			cout << "ID                : " << materials.at(i).id << endl;
+			cout << "Movie title       : " << materials.at(i).filmTitle << endl;
+			cout << "Video format      : " << materials.at(i).format << endl;
+			cout << "Audio format      : " << materials.at(i).audioFormat << endl;
+			cout << "Runtime           : " << materials.at(i).runtime << endl;
+			cout << "Language          : " << materials.at(i).language << endl;
+			cout << "Retail price      : " << materials.at(i).retailPrice << endl;
+			cout << endl;
+		}
+	}
 }
